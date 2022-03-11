@@ -59,6 +59,7 @@ export default {
 
       for (let i=0;i<this.candidateCount;i++) {
         name = await smartContract.getCandidateName(i)
+
         vote = await smartContract.getCandidateTotalVote(name)
         console.log(`Candidate Name: ${name} Votes: ${vote}`);
         this.candidates.push({"name": name, "vote": vote, "img": "https://loremflickr.com/320/240"})

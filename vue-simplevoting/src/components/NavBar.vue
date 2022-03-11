@@ -51,6 +51,7 @@
       <b-tag type="is-medium is-dark"> Network: {{ web3.networkId }} </b-tag>
       <b-tag type="is-medium is-info"> Account: {{ web3.coinbase }} </b-tag>
       <b-tag type="is-medium is-success"> Balance: {{ web3.balance }} ETH </b-tag>
+      <b-tag type="is-medium is-warning"> Candidate Count: {{ web3.candidateCount }}</b-tag>
     </b-taglist>
 
 
@@ -72,7 +73,8 @@ export default {
   data: () => ({
     account: null,
     block: null,
-    balance: null
+    balance: null,
+    candidateCount: null
   }),
   computed: {
     ...mapState({
@@ -80,6 +82,7 @@ export default {
     })
   },
   async created () {
+    await smartContract.init()
     // Load from local storage
     this.userData = new UserDataPersistance()
 
@@ -99,13 +102,20 @@ export default {
       this.balance = '0'
     }
 
-    console.log('Start: ', this.userData, this.account, this.balance, this.web3)
+    try {
+      this.candidateCount = await smartContract.getCandidateCount()
+    } catch (error) {
+      console.log(error.message)
+    }
+
+    console.log('Start: ', this.userData, this.account, this.balance, this.candidateCount,this.web3)
 
     if (this.account) {
       this.updateWeb3({
         'coinbase': this.account,
         'balance': this.balance,
-        'networkId': this.network.name
+        'networkId': this.network.name,
+        'candidateCount':this.candidateCount
       })
 
       let _this = this
@@ -121,7 +131,8 @@ export default {
         _this.updateWeb3({
           'coinbase': accounts[0],
           'balance': this.balance,
-          'networkId': this.network.name
+          'networkId': this.network.name,
+          'candidateCount':this.candidateCount
         })
       })
 
